@@ -2,10 +2,9 @@ pipeline{
     agent any
     stages{
         stage('Build'){
-            steps{
+            steps {
                 sh 'mvn clean package'
-            }
-        
+            }        
             post {
                 success {
                     echo 'Now archiving....'
@@ -13,10 +12,9 @@ pipeline{
                 }
             }
         }
-
-        stage('deploy to Staging'){
+        stage('Deploy to Staging'){
             steps {
-                build job: ' deploy-to-staging'
+                build job: 'deploy-to-staging'
             }
         }
              
