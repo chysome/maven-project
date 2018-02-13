@@ -5,20 +5,15 @@ pipeline{
             steps{
                 echo "Testing..."
             }
-        }
+        
 
-        stage('Build'){
-            steps {
-                echo "Building.."
+            post {
+                success {
+                    echo 'Now archiving....'
+                    archiveartifacts artifacts: '**/target/*.war'
+                }
             }
         }
-
-        stage('Deploy'){
-            steps {
-                echo "Deployed"
-            }
-        }
-        
-        
+             
     }
 }
