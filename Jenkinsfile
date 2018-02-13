@@ -1,44 +1,42 @@
-pipeline{
+pipeline {
     agent any
-    stages{
+
+    parameters {
+         string(name: 'tomcat_staging', defaultValue: '34.207.79.24', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: '34.207.79.24', description: 'Production Server')
+    }
+
+    triggers {
+         pollSCM('* * * * *')
+     }
+
+stages{
         stage('Build'){
-            steps{
+            steps {
                 sh 'mvn clean package'
             }
-        
             post {
                 success {
-                    echo 'Now archiving....'
+                    echo 'Now Archiving...'
                     archiveArtifacts artifacts: '**/target/*.war'
                 }
             }
         }
 
-        stage('Deploy to Staging'){
-            steps {
-                build job: 'deploy-to-staging'
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        sh "scp -i /var/lib/jenkins/Census-Prep.pem **/target/*.war ec2-user@${params.tomcat_staging}:/opt/tomcat-staging/webapps"
+                    }
+                }
+
+                stage ("Deploy to Production"){
+                    steps {
+                        sh "scp -i /var/lib/jenkins/Census-Prep.pem **/target/*.war ec2-user@${params.tomcat_prod}:/opt/tomcat-prod/webapps"
+                    }
+                }
             }
         }
-
-        stage('Deploy to Production'){
-            steps {
-                timeout(time:5, unit: 'DAYS'){
-                    input message:'Approve PRODUCTION Deployment?'
-                }
-
-                build job: 'deploy-to-prod'
-            }
-         
-            post{
-                success {
-                    echo 'Code deployed to production.'
-                }
-                failure {
-                    echo 'Deployment failed.'
-                }
-            }
-
-        }
-             
     }
 }
