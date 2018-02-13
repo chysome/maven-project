@@ -27,13 +27,13 @@ stages{
             parallel{
                 stage ('Deploy to Staging'){
                     steps {
-                        sh "scp -i /var/lib/jenkins/Census-Prep.pem **/target/*.war ec2-user@${params.tomcat_staging}:/opt/tomcat-staging/webapps"
+                        sh "scp -i /home/ec2-user/Census-Prep.pem **/target/*.war ec2-user@${params.tomcat_staging}:/opt/tomcat-staging/webapps"
                     }
                 }
 
                 stage ("Deploy to Production"){
                     steps {
-                        sh "scp -i /var/lib/jenkins/Census-Prep.pem **/target/*.war ec2-user@${params.tomcat_prod}:/opt/tomcat-prod/webapps"
+                        sh "scp -i /home/ec2-user/Census-Prep.pem **/target/*.war ec2-user@${params.tomcat_prod}:/opt/tomcat-prod/webapps"
                     }
                 }
             }
